@@ -1,0 +1,16 @@
+parameters:
+	level: 9
+	paths:
+		- src
+		- test
+	treatPhpDocTypesAsCertain: false
+	excludePaths:
+		- vendor
+	exceptions:
+		check:
+			missingCheckedExceptionInThrows: true
+			tooWideThrowType: true
+	ignoreErrors:
+		-
+			identifier: missingType.checkedException
+			path: test/*
