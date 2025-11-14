@@ -1,0 +1,16 @@
+version: 2
+updates:
+- package-ecosystem: composer
+  directory: "/"
+  schedule:
+    interval: daily
+
+- package-ecosystem: "github-actions"
+  directory: "/"
+  schedule:
+    interval: monthly
+
+- package-ecosystem: gomod
+  directory: "/test-server/"
+  schedule:
+    interval: monthly
