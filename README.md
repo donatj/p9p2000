@@ -1,5 +1,7 @@
 # PHP Plan 9 9P2000 
 
+[![CI](https://github.com/donatj/p9p2000/actions/workflows/ci.yml/badge.svg)](https://github.com/donatj/p9p2000/actions/workflows/ci.yml)
+
 This is a toy implementation of Plan 9's 9P2000 as a PHP stream wrapper alowing things like
 
 >  file_get_contents('9p://localhost:564/path/to/file');
