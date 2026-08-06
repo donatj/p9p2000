@@ -298,6 +298,7 @@ final class Client {
 		if( $unpacked === false ) {
 			throw new ProtocolException('Failed to unpack stat header');
 		}
+		/** @var array{size: int, type: int, dev: int} $unpacked */
 		$stat   = $unpacked;
 		$offset += 8;
 
@@ -310,7 +311,9 @@ final class Client {
 		if( $unpacked === false ) {
 			throw new ProtocolException('Failed to unpack stat times');
 		}
+		/** @var array{mode: int, atime: int, mtime: int, length: int} $unpacked */
 		$stat   = array_merge($stat, $unpacked);
+		/** @var array{size: int, type: int, dev: int, qid: array{type: int, version: int, path: int}, mode: int, atime: int, mtime: int, length: int} $stat */
 		$offset += 20;
 
 		// name, uid, gid, muid (all strings)
