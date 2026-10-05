@@ -131,6 +131,10 @@ final class StreamWrapper {
 		}
 	}
 
+	public function stream_flush() : bool {
+		return true;
+	}
+
 	/**
 	 * Tell position in stream
 	 */
