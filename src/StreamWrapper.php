@@ -21,7 +21,7 @@ final class StreamWrapper {
 	/**
 	 * Register the 9p:// protocol handler
 	 */
-	public static function register( string $protocol = '9p' ) : bool {
+	public static function register( string $protocol = '9p' ): bool {
 		if( in_array($protocol, stream_get_wrappers()) ) {
 			stream_wrapper_unregister($protocol);
 		}
@@ -32,14 +32,14 @@ final class StreamWrapper {
 	/**
 	 * Unregister the protocol handler
 	 */
-	public static function unregister( string $protocol = '9p' ) : bool {
+	public static function unregister( string $protocol = '9p' ): bool {
 		return stream_wrapper_unregister($protocol);
 	}
 
 	/**
 	 * Open a stream
 	 */
-	public function stream_open( string $path, string $mode, int $options, ?string &$opened_path ) : bool {
+	public function stream_open( string $path, string $mode, int $options, ?string &$opened_path ): bool {
 		$this->position = 0;
 
 		$parsed = self::parseUrl($path);
@@ -72,7 +72,7 @@ final class StreamWrapper {
 						}
 
 						$openMode = $this->phpModeToP9Mode($mode);
-						$this->client->create($parentFid, $fileName, 0666, $openMode);
+						$this->client->create($parentFid, $fileName, 0o666, $openMode);
 						$this->fid = $parentFid; // create leaves fid pointing to new file
 					} else {
 						throw $e;
@@ -98,7 +98,7 @@ final class StreamWrapper {
 	/**
 	 * Read from stream
 	 */
-	public function stream_read( int $count ) : string {
+	public function stream_read( int $count ): string {
 		if( !$this->client || $this->fid === null ) {
 			return '';
 		}
@@ -116,7 +116,7 @@ final class StreamWrapper {
 	/**
 	 * Write to stream
 	 */
-	public function stream_write( string $data ) : int {
+	public function stream_write( string $data ): int {
 		if( !$this->client || $this->fid === null ) {
 			return 0;
 		}
@@ -134,21 +134,21 @@ final class StreamWrapper {
 	/**
 	 * Tell position in stream
 	 */
-	public function stream_tell() : int {
+	public function stream_tell(): int {
 		return $this->position;
 	}
 
 	/**
 	 * Check if at end of stream
 	 */
-	public function stream_eof() : bool {
+	public function stream_eof(): bool {
 		return false; // 9P doesn't have a clear EOF concept
 	}
 
 	/**
 	 * Seek to position
 	 */
-	public function stream_seek( int $offset, int $whence = SEEK_SET ) : bool {
+	public function stream_seek( int $offset, int $whence = SEEK_SET ): bool {
 		return match ($whence) {
 			SEEK_SET => (($this->position = $offset) || true),
 			SEEK_CUR => (($this->position += $offset) || true),
@@ -162,7 +162,7 @@ final class StreamWrapper {
 	 *
 	 * @return array<int|string, int>|false
 	 */
-	public function stream_stat() : array|false {
+	public function stream_stat(): array|false {
 		if( !$this->client || $this->fid === null ) {
 			return false;
 		}
@@ -198,7 +198,7 @@ final class StreamWrapper {
 	/**
 	 * Close stream
 	 */
-	public function stream_close() : void {
+	public function stream_close(): void {
 		if( $this->client && $this->fid !== null ) {
 			try {
 				$this->client->clunk($this->fid);
@@ -217,7 +217,7 @@ final class StreamWrapper {
 	 *
 	 * @return array{host: string, port: int, path: string, user: string|null}|null
 	 */
-	private static function parseUrl( string $url ) : ?array {
+	private static function parseUrl( string $url ): ?array {
 		$parsed = parse_url($url);
 		if( !$parsed || !isset($parsed['host']) ) {
 			return null;
@@ -234,7 +234,7 @@ final class StreamWrapper {
 	/**
 	 * Convert PHP fopen mode to 9P open mode
 	 */
-	private function phpModeToP9Mode( string $mode ) : OpenMode {
+	private function phpModeToP9Mode( string $mode ): OpenMode {
 		$mode     = strtolower($mode);
 		$baseMode = $mode[0] ?? 'r';
 		$hasPlus  = str_contains($mode, '+');

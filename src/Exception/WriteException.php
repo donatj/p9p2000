@@ -17,15 +17,15 @@ class WriteException extends ServerErrorException {
 		parent::__construct('Write', $errorMessage, $previous);
 	}
 
-	public function getFid() : int {
+	public function getFid(): int {
 		return $this->fid;
 	}
 
-	public function getOffset() : int {
+	public function getOffset(): int {
 		return $this->offset;
 	}
 
-	public function getDataLength() : int {
+	public function getDataLength(): int {
 		return $this->dataLength;
 	}
 }

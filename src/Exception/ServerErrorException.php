@@ -19,11 +19,11 @@ class ServerErrorException extends P9p2000Exception {
 		);
 	}
 
-	public function getOperation() : string {
+	public function getOperation(): string {
 		return $this->operation;
 	}
 
-	public function getErrorMessage() : string {
+	public function getErrorMessage(): string {
 		return $this->errorMessage;
 	}
 }

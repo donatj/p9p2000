@@ -15,7 +15,7 @@ class StatException extends ServerErrorException {
 		parent::__construct('Stat', $errorMessage, $previous);
 	}
 
-	public function getFid() : int {
+	public function getFid(): int {
 		return $this->fid;
 	}
 }

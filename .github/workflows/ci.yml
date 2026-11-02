@@ -52,3 +52,9 @@ jobs:
 
       - name: Run tests
         run: composer test
+
+      - name: Verify formatting
+        run: composer test-fixer
+
+      - name: Verify documentation
+        run: composer test-docs

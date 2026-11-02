@@ -11,17 +11,17 @@ class ClientTest extends TestCase {
 	private const TEST_HOST = 'localhost';
 	private const TEST_PORT = 9999;
 
-	private static function createClient() : Client {
+	private static function createClient(): Client {
 		return Client::connect(self::TEST_HOST, self::TEST_PORT);
 	}
 
-	public function testConnect() : void {
+	public function testConnect(): void {
 		$client = self::createClient();
 		$this->assertInstanceOf(Client::class, $client); // @phpstan-ignore method.alreadyNarrowedType
 		$client->close();
 	}
 
-	public function testVersion() : void {
+	public function testVersion(): void {
 		$client = self::createClient();
 
 		$result = $client->version();
@@ -37,7 +37,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testAttach() : void {
+	public function testAttach(): void {
 		$client = self::createClient();
 		$client->version();
 
@@ -50,7 +50,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testWalkToRoot() : void {
+	public function testWalkToRoot(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -66,7 +66,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testOpenRootDirectory() : void {
+	public function testOpenRootDirectory(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -85,7 +85,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testWriteAndReadFile() : void {
+	public function testWriteAndReadFile(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -97,7 +97,7 @@ class ClientTest extends TestCase {
 		$createFid = $client->walk($rootFid, []);
 
 		// Create the file (0666 permissions)
-		$client->create($createFid, $testFileName, 0666, OpenMode::OWRITE);
+		$client->create($createFid, $testFileName, 0o666, OpenMode::OWRITE);
 
 		// Write to the file (createFid is now pointing to the new file)
 		$written = $client->write($createFid, 0, $testContent);
@@ -117,7 +117,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testReadAtOffset() : void {
+	public function testReadAtOffset(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -127,7 +127,7 @@ class ClientTest extends TestCase {
 
 		// Create and write file
 		$fileFid = $client->walk($rootFid, []);
-		$client->create($fileFid, $testFileName, 0666, OpenMode::OWRITE);
+		$client->create($fileFid, $testFileName, 0o666, OpenMode::OWRITE);
 		$client->write($fileFid, 0, $testContent);
 		$client->clunk($fileFid);
 
@@ -143,7 +143,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testMultipleWrites() : void {
+	public function testMultipleWrites(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -152,7 +152,7 @@ class ClientTest extends TestCase {
 
 		// Create file
 		$fileFid = $client->walk($rootFid, []);
-		$client->create($fileFid, $testFileName, 0666, OpenMode::OWRITE);
+		$client->create($fileFid, $testFileName, 0o666, OpenMode::OWRITE);
 
 		// Write at different offsets
 		$client->write($fileFid, 0, 'Hello');
@@ -173,7 +173,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testReadEmptyFile() : void {
+	public function testReadEmptyFile(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -182,7 +182,7 @@ class ClientTest extends TestCase {
 
 		// Create empty file
 		$fileFid = $client->walk($rootFid, []);
-		$client->create($fileFid, $testFileName, 0666, OpenMode::OWRITE);
+		$client->create($fileFid, $testFileName, 0o666, OpenMode::OWRITE);
 		$client->clunk($fileFid);
 
 		// Read empty file
@@ -197,7 +197,7 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
-	public function testCloseConnection() : void {
+	public function testCloseConnection(): void {
 		$client = self::createClient();
 		$client->version();
 		$rootFid = $client->attach('glenda', '');
@@ -211,7 +211,7 @@ class ClientTest extends TestCase {
 		$this->expectNotToPerformAssertions();
 	}
 
-	public function testInvalidHostThrowsException() : void {
+	public function testInvalidHostThrowsException(): void {
 		$this->expectException(\donatj\P9p2000\Exception\ConnectionException::class);
 		$this->expectExceptionMessage('Failed to connect');
 

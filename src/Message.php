@@ -14,7 +14,7 @@ final class Message {
 	/**
 	 * Encode a string with its length prefix (2 bytes)
 	 */
-	public static function encodeString( string $str ) : string {
+	public static function encodeString( string $str ): string {
 		return pack('v', strlen($str)) . $str;
 	}
 
@@ -22,10 +22,10 @@ final class Message {
 	 * Decode a string with length prefix
 	 * Returns: [string, newOffset]
 	 *
-	 * @return array{0: string, 1: int}
 	 * @throws ProtocolException If string decoding fails
+	 * @return array{0: string, 1: int}
 	 */
-	public static function decodeString( string $data, int $offset ) : array {
+	public static function decodeString( string $data, int $offset ): array {
 		$unpacked = unpack('v', substr($data, $offset, 2));
 		if( $unpacked === false ) {
 			throw new ProtocolException('Failed to unpack string length');
@@ -39,7 +39,7 @@ final class Message {
 	/**
 	 * Encode a Qid (13 bytes: type[1] version[4] path[8])
 	 */
-	public static function encodeQid( int $type, int $version, int $path ) : string {
+	public static function encodeQid( int $type, int $version, int $path ): string {
 		return pack('CVQ', $type, $version, $path);
 	}
 
@@ -47,10 +47,10 @@ final class Message {
 	 * Decode a Qid
 	 * Returns: [qid, newOffset]
 	 *
-	 * @return array{0: array{type: int, version: int, path: int}, 1: int}
 	 * @throws ProtocolException If Qid decoding fails
+	 * @return array{0: array{type: int, version: int, path: int}, 1: int}
 	 */
-	public static function decodeQid( string $data, int $offset ) : array {
+	public static function decodeQid( string $data, int $offset ): array {
 		$qid = unpack('Ctype/Vversion/Qpath', substr($data, $offset, 13));
 		if( $qid === false ) {
 			throw new ProtocolException('Failed to unpack Qid');
@@ -63,7 +63,7 @@ final class Message {
 	/**
 	 * Encode a message header (size[4] type[1] tag[2])
 	 */
-	public static function encodeHeader( MessageType $type, int $tag, string $body ) : string {
+	public static function encodeHeader( MessageType $type, int $tag, string $body ): string {
 		$size = 4 + 1 + 2 + strlen($body);
 
 		return pack('VCv', $size, $type->value, $tag) . $body;
@@ -72,12 +72,12 @@ final class Message {
 	/**
 	 * Decode message header
 	 *
-	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 * @throws ProtocolException If header decoding fails
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
+	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 */
-	public static function decodeHeader( string $data ) : array {
+	public static function decodeHeader( string $data ): array {
 		$unpacked = unpack('Vsize/Ctype/vtag', substr($data, 0, 7));
 		if( $unpacked === false ) {
 			throw new ProtocolException('Failed to unpack message header');

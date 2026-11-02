@@ -21,7 +21,7 @@ class WalkException extends ServerErrorException {
 	/**
 	 * @return array<string>
 	 */
-	public function getPath() : array {
+	public function getPath(): array {
 		return $this->path;
 	}
 }

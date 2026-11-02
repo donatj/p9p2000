@@ -37,7 +37,7 @@ final class Client {
 	 *
 	 * @throws ConnectionException If connection to server fails
 	 */
-	public static function connect( string $host, int $port, int $msize = Protocol::DEFAULT_MSIZE ) : self {
+	public static function connect( string $host, int $port, int $msize = Protocol::DEFAULT_MSIZE ): self {
 		$socket = @fsockopen($host, $port, $errno, $errstr, 30);
 		if( !$socket ) {
 			throw new ConnectionException($errstr, $host, $port, $errno);
@@ -51,12 +51,12 @@ final class Client {
 	/**
 	 * Perform version negotiation
 	 *
-	 * @return array{msize: int, version: string}
 	 * @throws ProtocolException If version negotiation fails or response is invalid
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
+	 * @return array{msize: int, version: string}
 	 */
-	public function version( string $version = '9P2000' ) : array {
+	public function version( string $version = '9P2000' ): array {
 		$tag  = $this->nextTag++;
 		$body = pack('V', $this->msize) . Message::encodeString($version);
 		$msg  = Message::encodeHeader(MessageType::Tversion, $tag, $body);
@@ -90,7 +90,7 @@ final class Client {
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
 	 */
-	public function attach( string $uname, string $aname, int $afid = Protocol::NOFID ) : int {
+	public function attach( string $uname, string $aname, int $afid = Protocol::NOFID ): int {
 		$fid = $this->nextFid++;
 		$tag = $this->nextTag++;
 
@@ -118,7 +118,7 @@ final class Client {
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
 	 */
-	public function walk( int $fid, array $path ) : int {
+	public function walk( int $fid, array $path ): int {
 		$newFid = $this->nextFid++;
 		$tag    = $this->nextTag++;
 
@@ -141,13 +141,13 @@ final class Client {
 	/**
 	 * Open a file
 	 *
-	 * @return array{qid: array{type: int, version: int, path: int}, iounit: int}
 	 * @throws OpenException If open operation fails
 	 * @throws ProtocolException If response is invalid
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
+	 * @return array{qid: array{type: int, version: int, path: int}, iounit: int}
 	 */
-	public function open( int $fid, OpenMode $mode ) : array {
+	public function open( int $fid, OpenMode $mode ): array {
 		$tag  = $this->nextTag++;
 		$body = pack('VC', $fid, $mode->value);
 
@@ -173,13 +173,13 @@ final class Client {
 	/**
 	 * Create a file or directory
 	 *
-	 * @return array{qid: array{type: int, version: int, path: int}, iounit: int}
 	 * @throws CreateException If create operation fails
 	 * @throws ProtocolException If response is invalid
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
+	 * @return array{qid: array{type: int, version: int, path: int}, iounit: int}
 	 */
-	public function create( int $fid, string $name, int $perm, OpenMode $mode ) : array {
+	public function create( int $fid, string $name, int $perm, OpenMode $mode ): array {
 		$tag  = $this->nextTag++;
 		$body = pack('V', $fid) .
 			Message::encodeString($name) .
@@ -212,7 +212,7 @@ final class Client {
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
 	 */
-	public function read( int $fid, int $offset, int $count ) : string {
+	public function read( int $fid, int $offset, int $count ): string {
 		$tag  = $this->nextTag++;
 		$body = pack('VQV', $fid, $offset, $count);
 
@@ -241,7 +241,7 @@ final class Client {
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
 	 */
-	public function write( int $fid, int $offset, string $data ) : int {
+	public function write( int $fid, int $offset, string $data ): int {
 		$tag  = $this->nextTag++;
 		$body = pack('VQV', $fid, $offset, strlen($data)) . $data;
 
@@ -264,13 +264,13 @@ final class Client {
 	/**
 	 * Get file/directory statistics
 	 *
-	 * @return array{type: int, dev: int, qid: array{type: int, version: int, path: int}, mode: int, atime: int, mtime: int, length: int, name: string, uid: string, gid: string, muid: string}
 	 * @throws StatException If stat operation fails
 	 * @throws ProtocolException If response is invalid
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
+	 * @return array{type: int, dev: int, qid: array{type: int, version: int, path: int}, mode: int, atime: int, mtime: int, length: int, name: string, uid: string, gid: string, muid: string}
 	 */
-	public function stat( int $fid ) : array {
+	public function stat( int $fid ): array {
 		$tag  = $this->nextTag++;
 		$body = pack('V', $fid);
 
@@ -342,7 +342,7 @@ final class Client {
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
 	 */
-	public function clunk( int $fid ) : void {
+	public function clunk( int $fid ): void {
 		$tag  = $this->nextTag++;
 		$body = pack('V', $fid);
 
@@ -358,12 +358,12 @@ final class Client {
 	/**
 	 * Read a complete message from the socket
 	 *
-	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 * @throws ProtocolException If message reading or decoding fails
 	 * @throws \TypeError If message type has wrong type
 	 * @throws \ValueError If message type value is invalid
+	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 */
-	private function readMessage() : array {
+	private function readMessage(): array {
 		$sizeData = fread($this->socket, 4);
 		if( $sizeData === false || strlen($sizeData) < 4 ) {
 			throw new ProtocolException('Failed to read message size');
@@ -397,7 +397,7 @@ final class Client {
 	 *
 	 * @throws ProtocolException If error message decoding fails
 	 */
-	private function decodeError( string $body ) : string {
+	private function decodeError( string $body ): string {
 		[ $error, ] = Message::decodeString($body, 0);
 
 		return $error;
@@ -406,7 +406,7 @@ final class Client {
 	/**
 	 * Close the connection
 	 */
-	public function close() : void {
+	public function close(): void {
 		if( !$this->closed ) {
 			fclose($this->socket);
 			$this->closed = true;
