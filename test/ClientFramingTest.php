@@ -6,10 +6,10 @@ use PHPUnit\Framework\TestCase;
 
 final class ClientFramingTest extends TestCase {
 
-	public function testTruncatedResponseDoesNotHang(): void {
+	public function testOversizedResponseClosesConnection(): void {
 		$sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
 		$this->assertIsArray($sockets);
-		fwrite($sockets[0], pack('V', 10) . "\x65");
+		fwrite($sockets[0], pack('V', 8193));
 		fclose($sockets[0]);
 
 		$reflection = new ReflectionClass(Client::class);
@@ -19,6 +19,12 @@ final class ClientFramingTest extends TestCase {
 		$constructor->invoke($client, $sockets[1], 8192);
 
 		$this->expectException(ProtocolException::class);
-		$reflection->getMethod('readMessage')->invoke($client);
+		$this->expectExceptionMessage('Invalid message size');
+
+		try {
+			$reflection->getMethod('readMessage')->invoke($client);
+		} finally {
+			$this->assertFalse(is_resource($sockets[1]));
+		}
 	}
 }

@@ -368,6 +368,8 @@ final class Client {
 		while( strlen($sizeData) < 4 ) {
 			$chunk = fread($this->socket, 4 - strlen($sizeData));
 			if( $chunk === false || $chunk === '' ) {
+				$this->close();
+
 				throw new ProtocolException('Failed to read message size');
 			}
 			$sizeData .= $chunk;
@@ -379,6 +381,8 @@ final class Client {
 		}
 		$size      = $unpacked[1];
 		if( $size < 7 || $size > $this->msize ) {
+			$this->close();
+
 			throw new ProtocolException('Invalid message size');
 		}
 		$remaining = $size - 4;
@@ -391,6 +395,8 @@ final class Client {
 			}
 			$chunk = fread($this->socket, $toRead);
 			if( $chunk === false || $chunk === '' ) {
+				$this->close();
+
 				throw new ProtocolException('Failed to read message data');
 			}
 			$data .= $chunk;
