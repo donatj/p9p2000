@@ -369,3 +369,7 @@ function stream_close(): void
 ```
 
 Close stream
+
+## Full API Docs
+
+[See: DOCS.md](DOCS.md)

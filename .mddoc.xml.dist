@@ -13,6 +13,13 @@
                 <file name="src/Client.php"/>
                 <file name="src/StreamWrapper.php"/>
             </section>
+            <section title="Full API Docs">
+                <docpage target="DOCS.md">
+                    <section title="Full API Docs">
+                        <recursive-directory warn-undocumented="false" name="src"/>
+                    </section>
+                </docpage>
+            </section>
         </section>
     </docpage>
 </mddoc>
