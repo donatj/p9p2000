@@ -62,6 +62,8 @@ final class StreamWrapper {
 					$this->fid = $this->client->walk($rootFid, $pathComponents);
 					$openMode  = $this->phpModeToP9Mode($mode);
 					$this->client->open($this->fid, $openMode);
+				} catch( ProtocolException $e ) {
+					throw $e;
 				} catch( P9p2000Exception $e ) {
 					// If walk failed and mode is write, try to create the file
 					if( str_contains($mode, 'w') || str_contains($mode, 'a') ) {

@@ -27,6 +27,12 @@ final class MessageTest extends TestCase {
 		Message::decodeHeader(pack('VCv', 8, MessageType::Rversion->value, 1));
 	}
 
+	public function testRejectsUnknownMessageType(): void {
+		$this->expectException(ProtocolException::class);
+		$this->expectExceptionMessage('Unknown message type');
+		Message::decodeHeader(pack('VCv', 7, 255, 1));
+	}
+
 	public function testDecodesCompleteString(): void {
 		$this->assertSame([ 'abc', 5 ], Message::decodeString("\x03\x00abc", 0));
 	}

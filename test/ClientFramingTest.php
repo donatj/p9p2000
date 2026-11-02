@@ -2,9 +2,34 @@
 
 use donatj\P9p2000\Client;
 use donatj\P9p2000\Exception\ProtocolException;
+use donatj\P9p2000\StreamWrapper;
 use PHPUnit\Framework\TestCase;
 
 final class ClientFramingTest extends TestCase {
+
+	public function testUnknownResponseTypePropagatesThroughStreamRead(): void {
+		$sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
+		$this->assertIsArray($sockets);
+		fwrite($sockets[0], pack('VCv', 7, 255, 0));
+
+		$reflection = new ReflectionClass(Client::class);
+		$client = $reflection->newInstanceWithoutConstructor();
+		$constructor = $reflection->getConstructor();
+		$this->assertNotNull($constructor);
+		$constructor->invoke($client, $sockets[1], 8192);
+		$wrapper = new StreamWrapper();
+		$wrapperReflection = new ReflectionClass(StreamWrapper::class);
+		$wrapperReflection->getProperty('client')->setValue($wrapper, $client);
+		$wrapperReflection->getProperty('fid')->setValue($wrapper, 1);
+
+		$this->expectException(ProtocolException::class);
+
+		try {
+			$wrapper->stream_read(1);
+		} finally {
+			fclose($sockets[0]);
+		}
+	}
 
 	public function testOversizedResponseClosesConnection(): void {
 		$sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);

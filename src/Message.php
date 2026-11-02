@@ -83,7 +83,6 @@ final class Message {
 	 *
 	 * @throws ProtocolException If header decoding fails
 	 * @throws \TypeError If message type has wrong type
-	 * @throws \ValueError If message type value is invalid
 	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 */
 	public static function decodeHeader( string $data ): array {
@@ -98,9 +97,14 @@ final class Message {
 			throw new ProtocolException('Invalid message size');
 		}
 
+		$type = MessageType::tryFrom($unpacked['type']);
+		if( $type === null ) {
+			throw new ProtocolException('Unknown message type');
+		}
+
 		return [
 			'size' => $unpacked['size'],
-			'type' => MessageType::from($unpacked['type']),
+			'type' => $type,
 			'tag'  => $unpacked['tag'],
 			'body' => substr($data, 7, $unpacked['size'] - 7),
 		];
