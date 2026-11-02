@@ -26,11 +26,17 @@ final class Message {
 	 * @return array{0: string, 1: int}
 	 */
 	public static function decodeString( string $data, int $offset ): array {
+		if( $offset < 0 || strlen($data) - $offset < 2 ) {
+			throw new ProtocolException('Failed to unpack string length');
+		}
 		$unpacked = unpack('v', substr($data, $offset, 2));
 		if( $unpacked === false ) {
 			throw new ProtocolException('Failed to unpack string length');
 		}
 		$len = $unpacked[1];
+		if( strlen($data) - $offset - 2 < $len ) {
+			throw new ProtocolException('Truncated string');
+		}
 		$str = substr($data, $offset + 2, $len);
 
 		return [ $str, $offset + 2 + $len ];
@@ -51,6 +57,9 @@ final class Message {
 	 * @return array{0: array{type: int, version: int, path: int}, 1: int}
 	 */
 	public static function decodeQid( string $data, int $offset ): array {
+		if( $offset < 0 || strlen($data) - $offset < 13 ) {
+			throw new ProtocolException('Failed to unpack Qid');
+		}
 		$qid = unpack('Ctype/Vversion/Qpath', substr($data, $offset, 13));
 		if( $qid === false ) {
 			throw new ProtocolException('Failed to unpack Qid');
@@ -74,18 +83,28 @@ final class Message {
 	 *
 	 * @throws ProtocolException If header decoding fails
 	 * @throws \TypeError If message type has wrong type
-	 * @throws \ValueError If message type value is invalid
 	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 */
 	public static function decodeHeader( string $data ): array {
+		if( strlen($data) < 7 ) {
+			throw new ProtocolException('Failed to unpack message header');
+		}
 		$unpacked = unpack('Vsize/Ctype/vtag', substr($data, 0, 7));
 		if( $unpacked === false ) {
 			throw new ProtocolException('Failed to unpack message header');
 		}
+		if( $unpacked['size'] < 7 || $unpacked['size'] > strlen($data) ) {
+			throw new ProtocolException('Invalid message size');
+		}
+
+		$type = MessageType::tryFrom($unpacked['type']);
+		if( $type === null ) {
+			throw new ProtocolException('Unknown message type');
+		}
 
 		return [
 			'size' => $unpacked['size'],
-			'type' => MessageType::from($unpacked['type']),
+			'type' => $type,
 			'tag'  => $unpacked['tag'],
 			'body' => substr($data, 7, $unpacked['size'] - 7),
 		];

@@ -364,9 +364,15 @@ final class Client {
 	 * @return array{size: int, type: MessageType, tag: int, body: string}
 	 */
 	private function readMessage(): array {
-		$sizeData = fread($this->socket, 4);
-		if( $sizeData === false || strlen($sizeData) < 4 ) {
-			throw new ProtocolException('Failed to read message size');
+		$sizeData = '';
+		while( strlen($sizeData) < 4 ) {
+			$chunk = fread($this->socket, 4 - strlen($sizeData));
+			if( $chunk === false || $chunk === '' ) {
+				$this->close();
+
+				throw new ProtocolException('Failed to read message size');
+			}
+			$sizeData .= $chunk;
 		}
 
 		$unpacked = unpack('V', $sizeData);
@@ -374,6 +380,11 @@ final class Client {
 			throw new ProtocolException('Failed to unpack message size');
 		}
 		$size      = $unpacked[1];
+		if( $size < 7 || $size > $this->msize ) {
+			$this->close();
+
+			throw new ProtocolException('Invalid message size');
+		}
 		$remaining = $size - 4;
 
 		$data = '';
@@ -383,7 +394,9 @@ final class Client {
 				break;
 			}
 			$chunk = fread($this->socket, $toRead);
-			if( $chunk === false ) {
+			if( $chunk === false || $chunk === '' ) {
+				$this->close();
+
 				throw new ProtocolException('Failed to read message data');
 			}
 			$data .= $chunk;

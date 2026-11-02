@@ -775,8 +775,6 @@ Decode message header
 
 **Throws**: `\TypeError` - If message type has wrong type
 
-**Throws**: `\ValueError` - If message type value is invalid
-
 #### Return Value
 
 - ***array{size: int,type: \donatj\P9p2000\MessageType,tag: int,body: string}***
@@ -924,6 +922,8 @@ function stream_read(int $count): string
 ```
 
 Read from stream
+
+**Throws**: `\donatj\P9p2000\Exception\ProtocolException` - If the server sends an invalid response
 
 ---
 
