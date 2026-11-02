@@ -21,15 +21,15 @@ class ConnectionException extends P9p2000Exception {
 		);
 	}
 
-	public function getHost() : string {
+	public function getHost(): string {
 		return $this->host;
 	}
 
-	public function getPort() : int {
+	public function getPort(): int {
 		return $this->port;
 	}
 
-	public function getErrorCode() : int {
+	public function getErrorCode(): int {
 		return $this->errorCode;
 	}
 }

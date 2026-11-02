@@ -10,19 +10,19 @@ class StreamWrapperTest extends TestCase {
 	private const TEST_HOST = 'localhost';
 	private const TEST_PORT = 9999;
 
-	private static function getBaseUrl() : string {
+	private static function getBaseUrl(): string {
 		return '9p://' . self::TEST_HOST . ':' . self::TEST_PORT;
 	}
 
-	protected function setUp() : void {
+	protected function setUp(): void {
 		StreamWrapper::register();
 	}
 
-	protected function tearDown() : void {
+	protected function tearDown(): void {
 		StreamWrapper::unregister();
 	}
 
-	public function testRegisterAndUnregister() : void {
+	public function testRegisterAndUnregister(): void {
 		$this->assertContains('9p', stream_get_wrappers());
 
 		StreamWrapper::unregister();
@@ -32,7 +32,7 @@ class StreamWrapperTest extends TestCase {
 		StreamWrapper::register();
 	}
 
-	public function testFileGetContents() : void {
+	public function testFileGetContents(): void {
 		$testFileName = 'stream-test-' . uniqid('', true) . '.txt';
 		$testContent  = 'Stream wrapper test content ' . time();
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -46,7 +46,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals($testContent, $content);
 	}
 
-	public function testFilePutContents() : void {
+	public function testFilePutContents(): void {
 		$testFileName = 'put-test-' . uniqid('', true) . '.txt';
 		$testContent  = 'Testing file_put_contents';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -61,7 +61,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals($testContent, $content);
 	}
 
-	public function testFopenReadMode() : void {
+	public function testFopenReadMode(): void {
 		$testFileName = 'fopen-read-' . uniqid('', true) . '.txt';
 		$testContent  = 'Testing fopen read mode';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -79,7 +79,7 @@ class StreamWrapperTest extends TestCase {
 		fclose($handle);
 	}
 
-	public function testFopenWriteMode() : void {
+	public function testFopenWriteMode(): void {
 		$testFileName = 'fopen-write-' . uniqid('', true) . '.txt';
 		$testContent  = 'Testing fopen write mode';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -97,7 +97,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals($testContent, $content);
 	}
 
-	public function testFgets() : void {
+	public function testFgets(): void {
 		$testFileName = 'fgets-test-' . uniqid('', true) . '.txt';
 		$testContent  = "Line 1\nLine 2\nLine 3";
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -112,7 +112,7 @@ class StreamWrapperTest extends TestCase {
 		fclose($handle); // @phpstan-ignore argument.type
 	}
 
-	public function testFtell() : void {
+	public function testFtell(): void {
 		$testFileName = 'ftell-test-' . uniqid('', true) . '.txt';
 		$testContent  = '0123456789';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -132,7 +132,7 @@ class StreamWrapperTest extends TestCase {
 		fclose($handle); // @phpstan-ignore argument.type
 	}
 
-	public function testFseek() : void {
+	public function testFseek(): void {
 		$testFileName = 'fseek-test-' . uniqid('', true) . '.txt';
 		$testContent  = '0123456789ABCDEFGHIJ';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
@@ -156,7 +156,7 @@ class StreamWrapperTest extends TestCase {
 		fclose($handle); // @phpstan-ignore argument.type
 	}
 
-	public function testMultipleReadsWrites() : void {
+	public function testMultipleReadsWrites(): void {
 		$testFileName = 'multi-rw-' . uniqid('', true) . '.txt';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
 
@@ -182,7 +182,7 @@ class StreamWrapperTest extends TestCase {
 		fclose($handle); // @phpstan-ignore argument.type
 	}
 
-	public function testEmptyFile() : void {
+	public function testEmptyFile(): void {
 		$testFileName = 'empty-stream-' . uniqid('', true) . '.txt';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
 
@@ -192,7 +192,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals('', $content);
 	}
 
-	public function testLargeContent() : void {
+	public function testLargeContent(): void {
 		$testFileName = 'large-' . uniqid('', true) . '.txt';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
 
@@ -206,7 +206,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals($testContent, $content);
 	}
 
-	public function testReadNonexistentFile() : void {
+	public function testReadNonexistentFile(): void {
 		$url = self::getBaseUrl() . '/nonexistent-file-' . uniqid('', true) . '.txt';
 
 		// Suppress warnings for this test
@@ -215,7 +215,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertFalse($content);
 	}
 
-	public function testCustomProtocolName() : void {
+	public function testCustomProtocolName(): void {
 		StreamWrapper::unregister();
 		StreamWrapper::register('ninep');
 
@@ -236,7 +236,7 @@ class StreamWrapperTest extends TestCase {
 		StreamWrapper::register();
 	}
 
-	public function testUrlWithUsername() : void {
+	public function testUrlWithUsername(): void {
 		$testFileName = 'username-test-' . uniqid('', true) . '.txt';
 		$testContent  = 'Testing with username in URL';
 		$url          = '9p://glenda@' . self::TEST_HOST . ':' . self::TEST_PORT . '/' . $testFileName;
@@ -247,7 +247,7 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals($testContent, $content);
 	}
 
-	public function testRootPath() : void {
+	public function testRootPath(): void {
 		// Access root directory
 		$url = self::getBaseUrl() . '/';
 

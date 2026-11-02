@@ -19,15 +19,15 @@ class CreateException extends ServerErrorException {
 		parent::__construct('Create', $errorMessage, $previous);
 	}
 
-	public function getName() : string {
+	public function getName(): string {
 		return $this->name;
 	}
 
-	public function getPermissions() : int {
+	public function getPermissions(): int {
 		return $this->permissions;
 	}
 
-	public function getMode() : OpenMode {
+	public function getMode(): OpenMode {
 		return $this->mode;
 	}
 }

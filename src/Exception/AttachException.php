@@ -16,11 +16,11 @@ class AttachException extends ServerErrorException {
 		parent::__construct('Attach', $errorMessage, $previous);
 	}
 
-	public function getUsername() : string {
+	public function getUsername(): string {
 		return $this->username;
 	}
 
-	public function getAname() : string {
+	public function getAname(): string {
 		return $this->aname;
 	}
 }

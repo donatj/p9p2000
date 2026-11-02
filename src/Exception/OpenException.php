@@ -18,11 +18,11 @@ class OpenException extends ServerErrorException {
 		parent::__construct('Open', $errorMessage, $previous);
 	}
 
-	public function getFid() : int {
+	public function getFid(): int {
 		return $this->fid;
 	}
 
-	public function getMode() : OpenMode {
+	public function getMode(): OpenMode {
 		return $this->mode;
 	}
 }

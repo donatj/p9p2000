@@ -15,11 +15,15 @@
         "phpstan/phpstan": "=2.1.35",
         "phpunit/phpunit": "^10.5",
         "phpstan/extension-installer": "^1.4",
-        "phpstan/phpstan-phpunit": "^2.0"
+        "phpstan/phpstan-phpunit": "^2.0",
+        "donatj/mddoc": "=0.14.1",
+        "corpus/php-cs-fixer-config": "=0.1.1"
     },
     "scripts": {
         "phpstan": "phpstan analyse",
-        "test": "phpunit"
+        "test": "phpunit",
+        "test-docs": "mddoc --dry-run=true",
+        "test-fixer": "php-cs-fixer fix --dry-run --diff"
     },
     "authors": [
         {

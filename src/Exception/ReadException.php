@@ -17,15 +17,15 @@ class ReadException extends ServerErrorException {
 		parent::__construct('Read', $errorMessage, $previous);
 	}
 
-	public function getFid() : int {
+	public function getFid(): int {
 		return $this->fid;
 	}
 
-	public function getOffset() : int {
+	public function getOffset(): int {
 		return $this->offset;
 	}
 
-	public function getCount() : int {
+	public function getCount(): int {
 		return $this->count;
 	}
 }

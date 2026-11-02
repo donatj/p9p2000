@@ -15,7 +15,7 @@ class ClunkException extends ServerErrorException {
 		parent::__construct('Clunk', $errorMessage, $previous);
 	}
 
-	public function getFid() : int {
+	public function getFid(): int {
 		return $this->fid;
 	}
 }
