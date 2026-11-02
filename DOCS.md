@@ -925,6 +925,8 @@ function stream_read(int $count): string
 
 Read from stream
 
+**Throws**: `\donatj\P9p2000\Exception\ProtocolException` - If the server sends an invalid response
+
 ---
 
 ### Method: StreamWrapper->stream_write

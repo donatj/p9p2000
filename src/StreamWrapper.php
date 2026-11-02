@@ -3,6 +3,7 @@
 namespace donatj\P9p2000;
 
 use donatj\P9p2000\Exception\P9p2000Exception;
+use donatj\P9p2000\Exception\ProtocolException;
 
 /**
  * Stream Wrapper for 9P2000 protocol
@@ -97,6 +98,8 @@ final class StreamWrapper {
 
 	/**
 	 * Read from stream
+	 *
+	 * @throws ProtocolException If the server sends an invalid response
 	 */
 	public function stream_read( int $count ): string {
 		if( !$this->client || $this->fid === null ) {
@@ -108,6 +111,8 @@ final class StreamWrapper {
 			$this->position += strlen($data);
 
 			return $data;
+		} catch( ProtocolException $e ) {
+			throw $e;
 		} catch( P9p2000Exception|\TypeError|\ValueError $e ) {
 			return '';
 		}
