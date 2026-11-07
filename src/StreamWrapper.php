@@ -138,7 +138,7 @@ final class StreamWrapper {
 		}
 	}
 
-	public function stream_flush() : bool {
+	public function stream_flush(): bool {
 		return true;
 	}
 
