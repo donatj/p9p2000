@@ -320,6 +320,16 @@ Write to stream
 
 ---
 
+#### Method: StreamWrapper->stream_flush
+
+```php
+function stream_flush(): bool
+```
+
+Undocumented
+
+---
+
 #### Method: StreamWrapper->stream_tell
 
 ```php
