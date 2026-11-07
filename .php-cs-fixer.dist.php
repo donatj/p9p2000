@@ -3,7 +3,8 @@
 use Corpus\PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
-$config = Config::php8x1();
+$config = Config::php8x1()
+	->setUnsupportedPhpVersionAllowed(true);
 
 return $config
     ->setRules(array_merge(
