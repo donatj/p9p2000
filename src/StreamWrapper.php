@@ -4,6 +4,7 @@ namespace donatj\P9p2000;
 
 use donatj\P9p2000\Exception\P9p2000Exception;
 use donatj\P9p2000\Exception\ProtocolException;
+use donatj\P9p2000\Exception\WalkException;
 
 /**
  * Stream Wrapper for 9P2000 protocol
@@ -15,9 +16,14 @@ use donatj\P9p2000\Exception\ProtocolException;
  */
 final class StreamWrapper {
 
+	/** @var resource|null Stream context supplied by PHP. */
+	public mixed $context = null;
+
 	private ?Client $client = null;
 	private ?int $fid = null;
 	private int $position = 0;
+	private bool $eof = false;
+	private bool $append = false;
 
 	/**
 	 * Register the 9p:// protocol handler
@@ -42,6 +48,8 @@ final class StreamWrapper {
 	 */
 	public function stream_open( string $path, string $mode, int $options, ?string &$opened_path ): bool {
 		$this->position = 0;
+		$this->eof      = false;
+		$this->append   = strtolower($mode[0] ?? '') === 'a';
 
 		$parsed = self::parseUrl($path);
 		if( !$parsed ) {
@@ -62,9 +70,7 @@ final class StreamWrapper {
 					$this->fid = $this->client->walk($rootFid, $pathComponents);
 					$openMode  = $this->phpModeToP9Mode($mode);
 					$this->client->open($this->fid, $openMode);
-				} catch( ProtocolException $e ) {
-					throw $e;
-				} catch( P9p2000Exception $e ) {
+				} catch( WalkException $e ) {
 					// If walk failed and mode is write, try to create the file
 					if( str_contains($mode, 'w') || str_contains($mode, 'a') ) {
 						$fileName = array_pop($pathComponents);
@@ -111,6 +117,7 @@ final class StreamWrapper {
 		try {
 			$data           = $this->client->read($this->fid, $this->position, $count);
 			$this->position += strlen($data);
+			$this->eof = $data === '';
 
 			return $data;
 		} catch( ProtocolException $e ) {
@@ -129,6 +136,9 @@ final class StreamWrapper {
 		}
 
 		try {
+			if( $this->append ) {
+				$this->position = $this->client->stat($this->fid)['length'];
+			}
 			$written        = $this->client->write($this->fid, $this->position, $data);
 			$this->position += $written;
 
@@ -153,19 +163,25 @@ final class StreamWrapper {
 	 * Check if at end of stream
 	 */
 	public function stream_eof(): bool {
-		return false; // 9P doesn't have a clear EOF concept
+		return $this->eof;
 	}
 
 	/**
 	 * Seek to position
 	 */
 	public function stream_seek( int $offset, int $whence = SEEK_SET ): bool {
-		return match ($whence) {
-			SEEK_SET => (($this->position = $offset) || true),
-			SEEK_CUR => (($this->position += $offset) || true),
-			SEEK_END => false, // Can't easily determine file size in 9P without stat
-			default  => false,
+		$position = match ($whence) {
+			SEEK_SET => $offset,
+			SEEK_CUR => $this->position + $offset,
+			default  => -1,
 		};
+		if( $position < 0 ) {
+			return false;
+		}
+		$this->position = $position;
+		$this->eof = false;
+
+		return true;
 	}
 
 	/**
@@ -252,7 +268,7 @@ final class StreamWrapper {
 
 		return match ($baseMode) {
 			'r'     => $hasPlus ? OpenMode::ORDWR : OpenMode::OREAD,
-			'w'     => $hasPlus ? OpenMode::ORDWR : OpenMode::OWRITE,
+			'w'     => $hasPlus ? OpenMode::ORDWR_TRUNC : OpenMode::OWRITE_TRUNC,
 			'a'     => $hasPlus ? OpenMode::ORDWR : OpenMode::OWRITE,
 			default => OpenMode::OREAD,
 		};

@@ -263,6 +263,18 @@ Usage:
 StreamWrapper::register();
   $content = file_get_contents('9p://localhost:564/path/to/file');
 
+```php
+<?php
+namespace donatj\P9p2000;
+
+class StreamWrapper {
+	/**
+	 * @var resource|null Stream context supplied by PHP.
+	 */
+	public $context = null;
+}
+```
+
 #### Method: StreamWrapper::register
 
 ```php

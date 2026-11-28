@@ -12,5 +12,7 @@ enum OpenMode: int {
 	case ORDWR = 0x02;
 	case OEXEC = 0x03;
 	case OTRUNC = 0x10;
+	case OWRITE_TRUNC = 0x11;
+	case ORDWR_TRUNC = 0x12;
 	case ORCLOSE = 0x40;
 }

@@ -833,6 +833,8 @@ enum OpenMode: int {
 	case ORDWR = 0x2;
 	case OEXEC = 0x3;
 	case OTRUNC = 0x10;
+	case OWRITE_TRUNC = 0x11;
+	case ORDWR_TRUNC = 0x12;
 	case ORCLOSE = 0x40;
 }
 ```
@@ -879,6 +881,18 @@ Allows using 9p:// URLs with standard PHP file functions
 Usage:
 StreamWrapper::register();
   $content = file_get_contents('9p://localhost:564/path/to/file');
+
+```php
+<?php
+namespace donatj\P9p2000;
+
+class StreamWrapper {
+	/**
+	 * @var resource|null Stream context supplied by PHP.
+	 */
+	public $context = null;
+}
+```
 
 ### Method: StreamWrapper::register
 
