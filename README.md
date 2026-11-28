@@ -23,6 +23,42 @@ Install the latest version with:
 composer require 'donatj/p9p2000'
 ```
 
+## Examples
+
+### Basic Usage
+
+This example writes a uniquely named file to the included 9P test server and reads it back. Start the server in another terminal with `cd test-server && go run .` before running the example or generating the documentation. The server listens on localhost port 9999. It keeps files in memory until it is stopped.
+
+```php
+<?php
+
+require __DIR__ . '/../vendor/autoload.php';
+
+use donatj\P9p2000\StreamWrapper;
+
+StreamWrapper::register();
+
+$file = '9p://localhost:9999/example-' . bin2hex(random_bytes(8)) . '.txt';
+
+if( file_put_contents($file, "Hello, 9P2000!\n") === false ) {
+	throw new RuntimeException('Failed to write the example file');
+}
+
+$contents = file_get_contents($file);
+if( $contents === false ) {
+	throw new RuntimeException('Failed to read the example file');
+}
+
+echo $contents;
+
+```
+
+Output:
+
+```
+Hello, 9P2000!
+```
+
 ## Documentation
 
 ### Class: donatj\P9p2000\Client
