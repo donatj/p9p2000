@@ -13,12 +13,21 @@ function connect(
 	string $host,
 	int $port,
 	int $msize = \donatj\P9p2000\Protocol::DEFAULT_MSIZE,
+	float $connectTimeout = 30,
+	$context = null,
 ): self
 ```
 
 Connect to a 9P2000 server
 
+#### Parameters
+
+- ***float*** `$connectTimeout` - Connection timeout in seconds; does not apply to reads or writes
+- ***resource*** | ***null*** `$context` - Socket stream context
+
 **Throws**: `\donatj\P9p2000\Exception\ConnectionException` - If connection to server fails
+
+**Throws**: `\ValueError` - If the connection timeout is not positive and finite
 
 ---
 
@@ -892,7 +901,7 @@ namespace donatj\P9p2000;
 class StreamWrapper {
 	/**
 	 * PHP assigns the stream context here, so this property must be public; declaring it prevents
-	 * dynamic property deprecation notices even though this wrapper does not use the context.
+	 * dynamic property deprecation notices. The wrapper uses it for connection options.
 	 * @var resource|null
 	 */
 	public $context = null;

@@ -32,6 +32,57 @@ class StreamWrapperTest extends TestCase {
 		StreamWrapper::register();
 	}
 
+	public function testConnectionContext(): void {
+		$url = self::getBaseUrl() . '/context-' . uniqid('', true) . '.txt';
+		$context = stream_context_create([
+			'9p' => [ 'connect_timeout' => 5.5 ],
+			'socket' => [ 'tcp_nodelay' => true ],
+		]);
+		$this->assertSame(4, file_put_contents($url, 'test', 0, $context));
+		$this->assertSame('test', file_get_contents($url, false, $context));
+	}
+
+	public function testSocketContextIsPassedToConnection(): void {
+		$context = stream_context_create([ 'socket' => [ 'tcp_nodelay' => true ] ]);
+		$wrapper = new StreamWrapper();
+		$wrapper->context = $context;
+		$openedPath = null;
+		$this->assertTrue($wrapper->stream_open(self::getBaseUrl() . '/', 'r', 0, $openedPath));
+
+		try {
+			$client = (new \ReflectionClass($wrapper))->getProperty('client')->getValue($wrapper);
+			$this->assertInstanceOf(\donatj\P9p2000\Client::class, $client);
+			$socket = (new \ReflectionClass($client))->getProperty('socket')->getValue($client);
+			$this->assertIsResource($socket);
+			$this->assertTrue(stream_context_get_options($socket)['socket']['tcp_nodelay']);
+		} finally {
+			$wrapper->stream_close();
+		}
+	}
+
+	public function testInvalidConnectionTimeoutIsRejected(): void {
+		foreach( [ 0, -1, INF, NAN, '1', null ] as $timeout ) {
+			$context = stream_context_create([ '9p' => [ 'connect_timeout' => $timeout ] ]);
+			$this->assertFalse(@fopen(self::getBaseUrl() . '/', 'r', false, $context));
+		}
+	}
+
+	public function testConnectionContextWithCustomProtocol(): void {
+		StreamWrapper::register('ninep');
+
+		try {
+			$context = stream_context_create([ '9p' => [ 'connect_timeout' => 5 ] ]);
+			$handle = fopen('ninep://' . self::TEST_HOST . ':' . self::TEST_PORT . '/', 'r', false, $context);
+			$this->assertIsResource($handle);
+			fclose($handle);
+
+			$invalid = stream_context_create([ '9p' => [ 'connect_timeout' => -1 ] ]);
+			$this->assertFalse(@fopen('ninep://' . self::TEST_HOST . ':' . self::TEST_PORT . '/', 'r', false, $invalid));
+		} finally {
+			StreamWrapper::unregister('ninep');
+		}
+	}
+
 	public function testFileGetContents(): void {
 		$testFileName = 'stream-test-' . uniqid('', true) . '.txt';
 		$testContent  = 'Stream wrapper test content ' . time();

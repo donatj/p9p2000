@@ -17,6 +17,17 @@
                     <exec cmd="php example/basic.php" format="code-block"/>
                 </section>
             </section>
+            <section title="Stream Context">
+                <text>The `9p` context option `connect_timeout` sets the connection timeout in seconds. It accepts a positive finite integer or float. The default is 30 seconds. It does not set a read or write timeout. PHP `socket` context options are passed to the TCP connection. The `9p` option name also applies to custom registered protocol names.</text>
+                <text><![CDATA[```php
+\donatj\P9p2000\StreamWrapper::register();
+$context = stream_context_create([
+    '9p' => ['connect_timeout' => 5.0],
+    'socket' => ['tcp_nodelay' => true],
+]);
+$contents = file_get_contents('9p://localhost:564/path/to/file', false, $context);
+```]]></text>
+            </section>
             <section title="Documentation">
                 <file name="src/Client.php"/>
                 <file name="src/StreamWrapper.php"/>
