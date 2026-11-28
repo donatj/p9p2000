@@ -891,7 +891,9 @@ namespace donatj\P9p2000;
 
 class StreamWrapper {
 	/**
-	 * @var resource|null Stream context supplied by PHP.
+	 * PHP assigns the stream context here, so this property must be public; declaring it prevents
+	 * dynamic property deprecation notices even though this wrapper does not use the context.
+	 * @var resource|null
 	 */
 	public $context = null;
 }
