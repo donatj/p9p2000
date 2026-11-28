@@ -21,7 +21,7 @@ final class StreamWrapper {
 
 	/**
 	 * PHP assigns the stream context here, so this property must be public; declaring it prevents
-	 * dynamic property deprecation notices even though this wrapper does not use the context.
+	 * dynamic property deprecation notices. The wrapper uses it for connection options.
 	 *
 	 * @see https://www.php.net/manual/en/class.streamwrapper.php#streamwrapper.props.context
 	 * @var resource|null
@@ -66,7 +66,13 @@ final class StreamWrapper {
 		}
 
 		try {
-			$this->client = Client::connect($parsed['host'], $parsed['port']);
+			$contextOptions = $this->context === null ? [] : stream_context_get_options($this->context);
+			$protocolOptions = $contextOptions['9p'] ?? [];
+			$timeout = array_key_exists('connect_timeout', $protocolOptions) ? $protocolOptions['connect_timeout'] : 30;
+			if( !is_int($timeout) && !is_float($timeout) ) {
+				throw new \ValueError('9p connect_timeout must be a positive finite number');
+			}
+			$this->client = Client::connect($parsed['host'], $parsed['port'], connectTimeout: $timeout, context: $this->context);
 			$this->client->version();
 
 			$rootFid = $this->client->attach($parsed['user'] ?? 'nobody', '');

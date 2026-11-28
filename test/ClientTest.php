@@ -21,6 +21,13 @@ class ClientTest extends TestCase {
 		$client->close();
 	}
 
+	public function testConnectWithTransportAndContext(): void {
+		$context = stream_context_create([ 'socket' => [ 'tcp_nodelay' => true ] ]);
+		$client = Client::connect('tcp://' . self::TEST_HOST, self::TEST_PORT, context: $context);
+		$this->assertSame('9P2000', $client->version()['version']);
+		$client->close();
+	}
+
 	public function testVersion(): void {
 		$client = self::createClient();
 

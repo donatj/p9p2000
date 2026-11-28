@@ -35,12 +35,33 @@ final class Client {
 	/**
 	 * Connect to a 9P2000 server
 	 *
+	 * @param float         $connectTimeout Connection timeout in seconds; does not apply to reads or writes
+	 * @param resource|null $context        Socket stream context
 	 * @throws ConnectionException If connection to server fails
+	 * @throws \ValueError If the connection timeout is not positive and finite
 	 */
-	public static function connect( string $host, int $port, int $msize = Protocol::DEFAULT_MSIZE ): self {
-		$socket = @fsockopen($host, $port, $errno, $errstr, 30);
+	public static function connect( string $host, int $port, int $msize = Protocol::DEFAULT_MSIZE, float $connectTimeout = 30, mixed $context = null ): self {
+		if( !is_finite($connectTimeout) || $connectTimeout <= 0 ) {
+			throw new \ValueError('Connection timeout must be a positive finite number');
+		}
+		if( $context === null ) {
+			$socket = @fsockopen($host, $port, $errno, $errstr, $connectTimeout);
+		} else {
+			if( str_starts_with($host, 'unix://') || str_starts_with($host, 'udg://') ) {
+				$address = $host;
+			} elseif( str_contains($host, '://') ) {
+				$address = $host . ':' . $port;
+			} else {
+				$address = $host;
+				if( str_contains($address, ':') && !str_starts_with($address, '[') ) {
+					$address = '[' . $address . ']';
+				}
+				$address = 'tcp://' . $address . ':' . $port;
+			}
+			$socket = @stream_socket_client($address, $errno, $errstr, $connectTimeout, STREAM_CLIENT_CONNECT, $context);
+		}
 		if( !$socket ) {
-			throw new ConnectionException($errstr, $host, $port, $errno);
+			throw new ConnectionException($errstr ?? 'Connection failed', $host, $port, $errno ?? 0);
 		}
 
 		stream_set_blocking($socket, true);
