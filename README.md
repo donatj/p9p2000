@@ -259,9 +259,26 @@ Undocumented
 Stream Wrapper for 9P2000 protocol
 Allows using 9p:// URLs with standard PHP file functions
 
+Append mode obtains the file size before each write. This is not atomic:
+concurrent writers can overwrite each other unless the server enforces append-only writes.
+
 Usage:
 StreamWrapper::register();
   $content = file_get_contents('9p://localhost:564/path/to/file');
+
+```php
+<?php
+namespace donatj\P9p2000;
+
+class StreamWrapper {
+	/**
+	 * PHP assigns the stream context here, so this property must be public; declaring it prevents
+	 * dynamic property deprecation notices even though this wrapper does not use the context.
+	 * @var resource|null
+	 */
+	public $context = null;
+}
+```
 
 #### Method: StreamWrapper::register
 

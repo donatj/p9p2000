@@ -134,6 +134,20 @@ final class Client {
 		if( $response['type'] === MessageType::Rerror ) {
 			throw new WalkException($this->decodeError($response['body']), $path);
 		}
+		if( $response['type'] !== MessageType::Rwalk || strlen($response['body']) < 2 ) {
+			throw new ProtocolException('Invalid walk response');
+		}
+		$unpacked = unpack('v', substr($response['body'], 0, 2));
+		if( $unpacked === false ) {
+			throw new ProtocolException('Invalid walk response');
+		}
+		$count = $unpacked[1];
+		if( $count > count($path) || strlen($response['body']) !== 2 + 13 * $count ) {
+			throw new ProtocolException('Invalid walk response');
+		}
+		if( $count !== count($path) ) {
+			throw new WalkException('Path was only partially walked', $path);
+		}
 
 		return $newFid;
 	}

@@ -2,10 +2,34 @@
 
 use donatj\P9p2000\Client;
 use donatj\P9p2000\Exception\ProtocolException;
+use donatj\P9p2000\Exception\WalkException;
 use donatj\P9p2000\StreamWrapper;
 use PHPUnit\Framework\TestCase;
 
 final class ClientFramingTest extends TestCase {
+
+	public function testPartialWalkFails(): void {
+		$sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);
+		$this->assertIsArray($sockets);
+		$body = pack('v', 1) . str_repeat("\0", 13);
+		fwrite($sockets[0], pack('VCv', 7 + strlen($body), 111, 0) . $body);
+
+		$reflection = new ReflectionClass(Client::class);
+		$client = $reflection->newInstanceWithoutConstructor();
+		$constructor = $reflection->getConstructor();
+		$this->assertNotNull($constructor);
+		$constructor->invoke($client, $sockets[1], 8192);
+
+		try {
+			$client->walk(0, [ 'existing', 'missing' ]);
+			$this->fail('A partial walk must fail');
+		} catch( WalkException $e ) {
+			$this->assertSame([ 'existing', 'missing' ], $e->getPath());
+		} finally {
+			$client->close();
+			fclose($sockets[0]);
+		}
+	}
 
 	public function testUnknownResponseTypePropagatesThroughStreamRead(): void {
 		$sockets = stream_socket_pair(STREAM_PF_UNIX, STREAM_SOCK_STREAM, STREAM_IPPROTO_IP);

@@ -192,6 +192,34 @@ class StreamWrapperTest extends TestCase {
 		$this->assertEquals('', $content);
 	}
 
+	public function testEofAndSeek(): void {
+		$url = self::getBaseUrl() . '/eof-' . uniqid('', true) . '.txt';
+		file_put_contents($url, 'abc');
+		$handle = fopen($url, 'r');
+		$this->assertIsResource($handle);
+		$this->assertSame('abc', stream_get_contents($handle));
+		$this->assertTrue(feof($handle));
+		$this->assertSame(0, fseek($handle, 0));
+		$this->assertFalse(feof($handle));
+		$this->assertSame('a', fread($handle, 1));
+		fclose($handle);
+	}
+
+	public function testWriteModesTruncateAndAppend(): void {
+		$url = self::getBaseUrl() . '/modes-' . uniqid('', true) . '.txt';
+		$this->assertSame(6, file_put_contents($url, 'abcdef'));
+		$this->assertSame(1, file_put_contents($url, 'x'));
+		$this->assertSame('x', file_get_contents($url));
+		$this->assertSame(1, file_put_contents($url, 'y', FILE_APPEND));
+		$this->assertSame('xy', file_get_contents($url));
+		$handle = fopen($url, 'a+');
+		$this->assertIsResource($handle);
+		$this->assertSame(0, fseek($handle, 0));
+		$this->assertSame(1, fwrite($handle, 'z'));
+		fclose($handle);
+		$this->assertSame('xyz', file_get_contents($url));
+	}
+
 	public function testLargeContent(): void {
 		$testFileName = 'large-' . uniqid('', true) . '.txt';
 		$url          = self::getBaseUrl() . '/' . $testFileName;
