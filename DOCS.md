@@ -878,6 +878,9 @@ enum QidType: int {
 Stream Wrapper for 9P2000 protocol
 Allows using 9p:// URLs with standard PHP file functions
 
+Append mode obtains the file size before each write. This is not atomic:
+concurrent writers can overwrite each other unless the server enforces append-only writes.
+
 Usage:
 StreamWrapper::register();
   $content = file_get_contents('9p://localhost:564/path/to/file');
