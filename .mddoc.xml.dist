@@ -9,6 +9,12 @@
             <text><![CDATA[<img width="1004" height="565" alt="image" src="https://github.com/user-attachments/assets/fd13e288-1391-4f67-a171-e49b93e11573" />]]></text>
             <section title="Requirements"><composer-requires/></section>
             <section title="Installing"><composer-install/></section>
+            <section title="Basic Usage">
+                <text>This example writes a uniquely named file to the included 9P test server and reads it back. Start the server in another terminal with `cd test-server &amp;&amp; go run .` before running the example or generating the documentation. The server listens on localhost port 9999. It keeps files in memory until it is stopped.</text>
+                <source name="example/basic.php" lang="php"/>
+                <text>Output:</text>
+                <exec cmd="php example/basic.php" format="code-block"/>
+            </section>
             <section title="Documentation">
                 <file name="src/Client.php"/>
                 <file name="src/StreamWrapper.php"/>
