@@ -23,7 +23,9 @@ Install the latest version with:
 composer require 'donatj/p9p2000'
 ```
 
-## Basic Usage
+## Examples
+
+### Basic Usage
 
 This example writes a uniquely named file to the included 9P test server and reads it back. Start the server in another terminal with `cd test-server && go run .` before running the example or generating the documentation. The server listens on localhost port 9999. It keeps files in memory until it is stopped.
 
